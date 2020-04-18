@@ -1,0 +1,26 @@
+{
+  "name": "ld46",
+  "version": "1.0.0",
+  "description": "Ludum Dare 46 - Keep It Alive",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheesepencil/ld46.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cheesepencil/ld46/issues"
+  },
+  "homepage": "https://github.com/cheesepencil/ld46#readme",
+  "devDependencies": {
+    "@types/node": "^13.11.1",
+    "parcel-bundler": "^1.12.4",
+    "phaser": "^3.22.0",
+    "typescript": "^3.8.3"
+  }
+}
