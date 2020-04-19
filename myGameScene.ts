@@ -43,26 +43,16 @@ export class MyGameScene extends Phaser.Scene {
     _waveCleared: boolean = false;
 
     constructor() {
-        super({ key: 'TitleScene' });
+        super({ key: 'MyGameScene' });
     }
 
     preload(): void {
-        this.load.image('test', require('./assets/test.png'));
-        this.load.image('background', require('./assets/background.png'));
-        this.load.image('knight', require('./assets/knight.png'));
-        this.load.image('steak', require('./assets/steak.png'));
-        this.load.image('smoke', require('./assets/smoke.png'));
-        this.load.image('gibs', require('./assets/gibs.png'));
-        this.load.image('dwaggie', require('./assets/dwaggie.png'));
-        this.load.image('gameOver', require('./assets/gameOver.png'));
-        this.load.image('youWin', require('./assets/youWin.png'));
-        this.load.image('firstWave', require('./assets/firstWave.png'));
-        this.load.image('secondWave', require('./assets/secondWave.png'));
-        this.load.image('finalWave', require('./assets/finalWave.png'));
-        this.load.image('neck', require('./assets/neck.png'));
+
     }
 
     create(): void {
+        this._gameOver = false;
+
         this.add.image(0, 0, 'background').setOrigin(0, 0);
         this._dragonHeadSprite = this.add.sprite(128, 100, 'test')
             .setOrigin(0.125, 0.5);

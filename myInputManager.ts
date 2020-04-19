@@ -4,7 +4,7 @@ export class MyInputManager {
     private _scene: Phaser.Scene;
     private _w_key: Phaser.Input.Keyboard.Key;
     private _s_key: Phaser.Input.Keyboard.Key;
-    private _esc_key: Phaser.Input.Keyboard.Key;
+    private _space_key: Phaser.Input.Keyboard.Key;
     private _pointer: Phaser.Input.Pointer;
     private _using_pad: boolean = false;
     private _charging: number = 0;
@@ -15,7 +15,7 @@ export class MyInputManager {
         this._head = head;
         this._w_key = scene.input.keyboard.addKey('w');
         this._s_key = scene.input.keyboard.addKey('s');
-        this._esc_key = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this._space_key = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this._pointer = scene.input.activePointer;
     }
 
@@ -79,7 +79,7 @@ export class MyInputManager {
             this._using_pad = false;
             result.headVerticalMovement = 1
         }
-        if (this._esc_key.isDown) {
+        if (this._space_key.isDown) {
             this._using_pad = false;
             result.reset = true;
         }
