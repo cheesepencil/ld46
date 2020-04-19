@@ -2,7 +2,7 @@ import { TestScene } from "./TestScene";
 
 type GameConfig = Phaser.Types.Core.GameConfig;
 
-let fps = 30;
+let fps = 60;
 
 export const MyGameConfig: GameConfig = {
     type: Phaser.AUTO,
@@ -11,7 +11,7 @@ export const MyGameConfig: GameConfig = {
         keyboard: true
     },
     render: {
-        antialias: true
+        antialias: false
     },
     scale: {
         mode: Phaser.Scale.FIT
@@ -20,7 +20,7 @@ export const MyGameConfig: GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            //debug: true,
             gravity: { y: 200 },
             fps: fps
         }

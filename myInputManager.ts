@@ -8,9 +8,11 @@ export class MyInputManager {
     private _pointer: Phaser.Input.Pointer;
     private _using_pad: boolean = false;
     private _charging: number = 0;
+    private _head: Phaser.GameObjects.Sprite;
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Phaser.Scene, head: Phaser.GameObjects.Sprite) {
         this._scene = scene;
+        this._head = head;
         this._w_key = scene.input.keyboard.addKey('w');
         this._s_key = scene.input.keyboard.addKey('s');
         this._esc_key = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -57,9 +59,9 @@ export class MyInputManager {
             // aim head with right stick
             let vertHeadAimAxis = pad.axes[3];
             if (vertHeadAimAxis) {
-                this._using_pad = true;
                 vertHeadAimAxis.threshold = 0.05;
                 result.headRotation = vertHeadAimAxis.getValue();
+                if (result.headRotation != 0) this._using_pad = true;
             }
             // restart scene with hamburger button
             let hamburgerButton = pad.buttons[9];
@@ -83,8 +85,17 @@ export class MyInputManager {
         }
 
         // mouse input (if not using gamepad)
-        if (!this._using_pad && this._pointer.isDown) {
-            result.charging = true;
+        if (!this._using_pad) {
+            if (this._pointer.isDown) {
+                result.charging = true;
+            }
+
+            let radians = Phaser.Math.Angle.Between(this._head.x, this._head.y, this._pointer.x, this._pointer.y);
+            let degrees = Phaser.Math.RadToDeg(radians)/90;
+            degrees = degrees > 1 ? 1 : degrees;
+            degrees = degrees < -1 ? -1 : degrees;
+            
+            result.headRotation = degrees;
         }
 
         result.usingPad = this._using_pad;
