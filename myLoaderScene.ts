@@ -42,6 +42,7 @@ export class MyLoaderScene extends Phaser.Scene {
         this.load.image('title', require('./assets/title.png'));
         this.load.image('pressSpace', require('./assets/pressSpace.png'));
         this.load.image('controls', require('./assets/controls.png'));
+        this.load.image('fireball', require('./assets/fireball.png'));
     }
 
     create() {

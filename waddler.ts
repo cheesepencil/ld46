@@ -122,6 +122,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
 
     onKillBaby() {
         if (this._isSteak) {
+            this.scene.events.emit('yummy', this._lane);
             this.destroy();
         }
         else {

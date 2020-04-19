@@ -14,7 +14,7 @@ export const MyGameConfig: GameConfig = {
         keyboard: true
     },
     render: {
-        antialias: false
+        antialias: true 
     },
     scale: {
         mode: Phaser.Scale.FIT

@@ -25,6 +25,8 @@ export class MyGameScene extends Phaser.Scene {
     _fireballs: Phaser.Physics.Arcade.Group;
     _minFireballVelocity = 200;
     _maxFireballVelocity = 1000;
+    _fireballSmokeManager: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    _throatSmokeManager: Phaser.GameObjects.Particles.ParticleEmitterManager;
 
     // waddlers
     _waddlers: Phaser.Physics.Arcade.Group;
@@ -57,6 +59,8 @@ export class MyGameScene extends Phaser.Scene {
         this._topDwaggieDead = false;
         this._midDwaggieDead = false;
         this._botDwaggieDead = false;
+        this._charge = 0;
+        this._lastSpew = 0;
 
         this.add.image(0, 0, 'background').setOrigin(0, 0);
 
@@ -71,10 +75,43 @@ export class MyGameScene extends Phaser.Scene {
             .setDragY(this._drag);
         this._dragonHeadBody.useDamping = true;
 
+        // throat particles
+        if (!this._throatSmokeManager) {
+            this._throatSmokeManager = this.add.particles('smoke');
+        } else {
+            this._throatSmokeManager.emitters.shutdown();
+        }
+        let throatSmoke = this._throatSmokeManager.createEmitter({
+            x: { onEmit: () => this._dragonHeadBody.x },
+            y: { onEmit: () => this._dragonHeadBody.y + 32 },
+            angle: { onEmit: () => this._dragonHeadBody.rotation },
+            speed: 500,
+            frequency: 0.5,
+            //gravityY: 50,
+            lifespan: { min: 250, max: 500 },
+            maxParticles: 2000,
+            scale: {
+                onEmit: () => { return 0.25 },
+                onUpdate: () => { return (this._charge / 100) * 1.5 }
+            },
+            tint: {
+                onUpdate: () => {
+                    let sat = 255 * (this._charge / 100);
+                    let newColor = new Phaser.Display.Color(sat, sat, 0);
+                    return newColor.color;
+                }
+            },
+            blendMode: Phaser.BlendModes.DARKEN,
+            rotate: { min: -180, max: 180 },
+            alpha: { start: 1, end: 0 }
+        });
+
         // neck stuff
         let points = this.recalculateNeck();
         this._neck = (this.add as any).rope(0, 0, 'neck', null, points);
         this._neck.setHorizontal();
+        this._neck.flipY = true;
+        this._neck.flipX = true;
         this._neck.setDepth(2);
 
         this._fireballs = new Phaser.Physics.Arcade.Group(this.physics.world, this);
@@ -95,6 +132,7 @@ export class MyGameScene extends Phaser.Scene {
 
         this.events.addListener('gameOver', this.onGameOver, this);
         this.events.addListener('steakified', this.onSteakified, this);
+        this.events.addListener('yummy', this.onYummy, this);
     }
 
     update(time: number, delta: number): void {
@@ -114,24 +152,42 @@ export class MyGameScene extends Phaser.Scene {
                 let oldCharge = this._charge;
                 let newCharge = this._charge + (this._chargeSpeed / delta);
                 this._charge = newCharge > 100 ? 100 : newCharge;
-
-                let newColor = Phaser.Display.Color
-                    .ValueToColor(this._dragonHeadSprite.tintTopLeft);
-                newColor.blue = 255 - Math.ceil(255 * (this._charge / 100));
-                newColor.green = 255 - Math.ceil(255 * (this._charge / 100));
-
-                this._dragonHeadSprite.tint = newColor.color;
             } else if (this._charge > 0) {
                 this._lastSpew = time;
                 this._dragonHeadSprite.tint = 0xffffff;
 
-                let fireballCircle = this.add.circle(this._dragonHeadSprite.x, this._dragonHeadSprite.y, 8, 0xff0000);
-                this._fireballs.add(fireballCircle);
+                let fireballSprite = this.add
+                    .sprite(this._dragonHeadSprite.x, this._dragonHeadSprite.y + 8, 'fireball')
+                    .setOrigin(0.5, 0.5);
+                this._fireballs.add(fireballSprite);
+                this.add.tween({
+                    targets: [fireballSprite],
+                    duration: 300,
+                    repeat: -1,
+                    angle: 360,
+                });
+
+                // smokey fireballs!
+                if (!this._fireballSmokeManager) {
+                    this._fireballSmokeManager = this.add.particles('fireball');
+                }
+                this._fireballSmokeManager.createEmitter({
+                    alpha: { start: 1, end: 0 },
+                    scale: { start: 0.95, end: 4 },
+                    speed: 0,
+                    rotate: { min: -180, max: 180 },
+                    lifespan: { min: 250, max: 500 },
+                    blendMode: 'ADD',
+                    frequency: 0.001,
+                    maxParticles: 2000,
+                    x: { onEmit: () => { return fireballSprite.x } },
+                    y: { onEmit: () => { return fireballSprite.y } }
+                })
 
                 // math!
                 let diff = this._maxFireballVelocity - this._minFireballVelocity;
                 let fireballVelocity = this._minFireballVelocity + Math.ceil((diff * (this._charge / 100)));
-                let fireballBody = (fireballCircle.body as Physics.Arcade.Body)
+                let fireballBody = (fireballSprite.body as Physics.Arcade.Body)
                     .setCollideWorldBounds();
                 fireballBody.onWorldBounds = true;
 
@@ -151,6 +207,10 @@ export class MyGameScene extends Phaser.Scene {
         let fireballs = this._fireballs.getChildren();
         let fireballFilter = fireballs.filter(f => f.body === body);
         if (fireballFilter) {
+            this.time.delayedCall(500, () => {
+                this._fireballSmokeManager.emitters.shutdown();
+            }, null, this);
+
             let fireball = fireballFilter[0];
             this._fireballs.killAndHide(fireball);
             fireball.destroy();
@@ -225,6 +285,31 @@ export class MyGameScene extends Phaser.Scene {
                 ease: 'Bounce.easeOut'
             })
             this._gameOver = true;
+        }
+    }
+
+    onYummy(lane: number) {
+        if (!this._gameOver) {
+            let dwaggie: GameObjects.Sprite;
+            if (lane === 0) {
+                dwaggie = this._topDwaggie;
+                dwaggie.y = 160 - 24;
+            } else if (lane === 1) {
+                dwaggie = this._midDwaggie;
+                dwaggie.y = 300 - 24;
+            } else if (lane === 2) {
+                dwaggie = this._botDwaggie;
+                dwaggie.y = 450 - 24;
+            }
+
+            this.add.tween({
+                targets: [dwaggie],
+                y: dwaggie.y - 48,
+                duration: 300,
+                repeat: 3,
+                yoyo: true,
+                ease: 'Bounce.easeOut',
+            });
         }
     }
 
@@ -305,7 +390,7 @@ export class MyGameScene extends Phaser.Scene {
         const curve = new Phaser.Curves.Spline([
             new Phaser.Math.Vector2(this._dragonHeadBody.x + 16, this._dragonHeadBody.y + 32),
             new Phaser.Math.Vector2(this._dragonHeadBody.x - 64, this._dragonHeadBody.y),
-            new Phaser.Math.Vector2(-32, 240)
+            new Phaser.Math.Vector2(-16, 240)
         ]);
 
         //  We'll divide the curve into points:
