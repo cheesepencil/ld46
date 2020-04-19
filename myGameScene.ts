@@ -52,6 +52,11 @@ export class MyGameScene extends Phaser.Scene {
 
     create(): void {
         this._gameOver = false;
+        this._waveCleared = false;
+        this._wave = 1;
+        this._topDwaggieDead = false;
+        this._midDwaggieDead = false;
+        this._botDwaggieDead = false;
 
         this.add.image(0, 0, 'background').setOrigin(0, 0);
 
@@ -84,7 +89,9 @@ export class MyGameScene extends Phaser.Scene {
         // Game is starting now
         this.startWave();
 
-        this._myInputManager = new MyInputManager(this, this._dragonHeadSprite);
+        if (!this._myInputManager) {
+            this._myInputManager = new MyInputManager(this, this._dragonHeadSprite);
+        }
 
         this.events.addListener('gameOver', this.onGameOver, this);
         this.events.addListener('steakified', this.onSteakified, this);
@@ -296,7 +303,7 @@ export class MyGameScene extends Phaser.Scene {
 
     recalculateNeck(): any {
         const curve = new Phaser.Curves.Spline([
-            new Phaser.Math.Vector2(this._dragonHeadBody.x + 16, this._dragonHeadBody.y + 32         ),
+            new Phaser.Math.Vector2(this._dragonHeadBody.x + 16, this._dragonHeadBody.y + 32),
             new Phaser.Math.Vector2(this._dragonHeadBody.x - 64, this._dragonHeadBody.y),
             new Phaser.Math.Vector2(-32, 240)
         ]);
