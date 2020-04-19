@@ -54,8 +54,10 @@ export class MyGameScene extends Phaser.Scene {
         this._gameOver = false;
 
         this.add.image(0, 0, 'background').setOrigin(0, 0);
+
         this._dragonHeadSprite = this.add.sprite(128, 100, 'test')
-            .setOrigin(0.125, 0.5);
+            .setOrigin(0.125, 0.5)
+            .setDepth(3);
         let dragonHead = this.physics.add.existing(this._dragonHeadSprite);
         this._dragonHeadBody = (dragonHead.body as Physics.Arcade.Body)
             .setGravityY(-200)
@@ -63,6 +65,12 @@ export class MyGameScene extends Phaser.Scene {
             .setMaxVelocity(0, this._maxVelocity)
             .setDragY(this._drag);
         this._dragonHeadBody.useDamping = true;
+
+        // neck stuff
+        let points = this.recalculateNeck();
+        this._neck = (this.add as any).rope(0, 0, 'neck', null, points);
+        this._neck.setHorizontal();
+        this._neck.setDepth(2);
 
         this._fireballs = new Phaser.Physics.Arcade.Group(this.physics.world, this);
         this._waddlers = new Phaser.Physics.Arcade.Group(this.physics.world, this);
@@ -72,21 +80,6 @@ export class MyGameScene extends Phaser.Scene {
         this._botDwaggie = this.add.sprite(24, 450 - 24, 'dwaggie');
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
-
-        // neck stuff
-        const curve = new Phaser.Curves.Spline([
-            new Phaser.Math.Vector2(this._dragonHeadBody.x, this._dragonHeadBody.y + 32),
-            //new Phaser.Math.Vector2(this._dragonHeadBody.x - 32, this._dragonHeadBody.y),
-            new Phaser.Math.Vector2(this._dragonHeadBody.x - 64, 480 - (480 - this._dragonHeadBody.y) / 2),
-            new Phaser.Math.Vector2(this._dragonHeadBody.x, 500)
-        ]);
-
-        //  We'll divide the curve into points:
-        const points = curve.getDistancePoints(10);
-
-        //  Then pass them to the Rope object:
-        this._neck = (this.add as any).rope(0, 0, 'neck', null, points);
-        this._neck.setVertical();
 
         // Game is starting now
         this.startWave();
@@ -142,17 +135,7 @@ export class MyGameScene extends Phaser.Scene {
         }
 
         // neck stuff
-        const curve = new Phaser.Curves.Spline([
-            new Phaser.Math.Vector2(this._dragonHeadBody.x, this._dragonHeadBody.y + 32),
-            //new Phaser.Math.Vector2(this._dragonHeadBody.x - 32, this._dragonHeadBody.y),
-            new Phaser.Math.Vector2(this._dragonHeadBody.x - 64, 480 - (480 - this._dragonHeadBody.y) / 2),
-            new Phaser.Math.Vector2(this._dragonHeadBody.x, 400)
-        ]);
-
-        //  We'll divide the curve into points:
-        const points = curve.getDistancePoints(5);
-
-        //  Then pass them to the Rope object:
+        let points = this.recalculateNeck();
         this._neck.setPoints(points);
     }
 
@@ -309,5 +292,16 @@ export class MyGameScene extends Phaser.Scene {
                 }
             }
         }
+    }
+
+    recalculateNeck(): any {
+        const curve = new Phaser.Curves.Spline([
+            new Phaser.Math.Vector2(this._dragonHeadBody.x + 16, this._dragonHeadBody.y + 32         ),
+            new Phaser.Math.Vector2(this._dragonHeadBody.x - 64, this._dragonHeadBody.y),
+            new Phaser.Math.Vector2(-32, 240)
+        ]);
+
+        //  We'll divide the curve into points:
+        return curve.getDistancePoints(5);
     }
 }
