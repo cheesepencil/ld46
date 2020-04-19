@@ -1,4 +1,4 @@
-import { TestScene } from "./TestScene";
+import { MyGameScene } from "./myGameScene";
 
 type GameConfig = Phaser.Types.Core.GameConfig;
 
@@ -31,5 +31,5 @@ export const MyGameConfig: GameConfig = {
         target: fps,
         forceSetTimeOut: true
     },
-    scene: [TestScene]
+    scene: [MyGameScene]
 };

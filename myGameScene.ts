@@ -4,7 +4,7 @@ import { Waddler } from "./waddler";
 
 type TweenConfig = Phaser.Types.Tweens.TweenBuilderConfig;
 
-export class TestScene extends Phaser.Scene {
+export class MyGameScene extends Phaser.Scene {
     // input aggregator
     _myInputManager: MyInputManager;
 
@@ -26,6 +26,14 @@ export class TestScene extends Phaser.Scene {
     // waddlers
     _waddlers: Phaser.Physics.Arcade.Group;
 
+    // dwaggies
+    _topDwaggie: Phaser.GameObjects.Sprite;
+    _topDwaggieDead: boolean = false;
+    _midDwaggie: Phaser.GameObjects.Sprite;
+    _midDwaggieDead: boolean = false;
+    _botDwaggie: Phaser.GameObjects.Sprite;
+    _botDwaggieDead: boolean = false;
+
     // game status
     _wave: number = 1;
     _gameOver: boolean = false;
@@ -42,6 +50,12 @@ export class TestScene extends Phaser.Scene {
         this.load.image('steak', require('./assets/steak.png'));
         this.load.image('smoke', require('./assets/smoke.png'));
         this.load.image('gibs', require('./assets/gibs.png'));
+        this.load.image('dwaggie', require('./assets/dwaggie.png'));
+        this.load.image('gameOver', require('./assets/gameOver.png'));
+        this.load.image('youWin', require('./assets/youWin.png'));
+        this.load.image('firstWave', require('./assets/firstWave.png'));
+        this.load.image('secondWave', require('./assets/secondWave.png'));
+        this.load.image('finalWave', require('./assets/finalWave.png'));
     }
 
     create(): void {
@@ -58,6 +72,10 @@ export class TestScene extends Phaser.Scene {
 
         this._fireballs = new Phaser.Physics.Arcade.Group(this.physics.world, this);
         this._waddlers = new Phaser.Physics.Arcade.Group(this.physics.world, this);
+
+        this._topDwaggie = this.add.sprite(24, 160 - 24, 'dwaggie');
+        this._midDwaggie = this.add.sprite(24, 300 - 24, 'dwaggie');
+        this._botDwaggie = this.add.sprite(24, 450 - 24, 'dwaggie');
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
 
@@ -125,33 +143,108 @@ export class TestScene extends Phaser.Scene {
         }
     }
 
-    onGameOver() {
-        this._dragonHeadBody.setGravityY(300);
-        this.tweens.add({
-            targets: [this._dragonHeadSprite],
-            duration: 1000,
-            angle: 60
+    onGameOver(lane: number) {
+        let dwaggie;
+        if (lane === 0) {
+            dwaggie = this._topDwaggie;
+            if (!this._topDwaggieDead) {
+                this._topDwaggieDead = true;
+                this.add.tween({
+                    targets: [dwaggie],
+                    rotation: 360,
+                    repeat: -1
+                });
+            }
+        } else if (lane === 1) {
+            dwaggie = this._midDwaggie;
+            if (!this._midDwaggieDead) {
+                this._midDwaggieDead = true;
+                this.add.tween({
+                    targets: [dwaggie],
+                    rotation: 360,
+                    repeat: -1
+                });
+            }
+        } else if (lane === 2) {
+            dwaggie = this._botDwaggie;
+            if (!this._botDwaggieDead) {
+                this._botDwaggieDead = true;
+                this.add.tween({
+                    targets: [dwaggie],
+                    rotation: 360,
+                    repeat: -1
+                });
+            }
+        }
+        let angle = Phaser.Math.Between(-100, 0);
+        let offsetX = Phaser.Math.Between(-20, 20);
+        let offsetY = Phaser.Math.Between(-20, 20);
+        let particles = this.add.particles('gibs');
+        let emitter = particles.createEmitter({
+            x: dwaggie.x + offsetX,
+            y: dwaggie.y - offsetY,
+            angle: { min: angle, max: angle + 2 },
+            speed: 100,
+            frequency: 2,
+            gravityY: 100,
+            lifespan: { min: 1000, max: 2000 },
+            //quantity: 6,
+            maxParticles: 100,
+            scale: { start: 1, end: 5 },
+            blendMode: Phaser.BlendModes.NORMAL,
+            rotate: { min: -180, max: 180 },
+            alpha: { start: 1, end: 0 },
         });
-        this._gameOver = true;
-        console.log('Game over, man!');
+
+        if (!this._gameOver) {
+            this._dragonHeadBody.setGravityY(300);
+            this.tweens.add({
+                targets: [this._dragonHeadSprite],
+                duration: 1000,
+                angle: 60
+            });
+            let gameOver = this.add.sprite(0, 480, 'gameOver').setOrigin(0, 0);
+            this.add.tween({
+                targets: [gameOver],
+                y: 0,
+                duration: 3000,
+                ease: 'Bounce.easeOut'
+            })
+            this._gameOver = true;
+        }
     }
 
     startWave() {
         this._waveCleared = false;
         if (this._wave === 1) {
-            console.log('Wave 1');
+            let firstWave = this.add.sprite(0, 640, 'firstWave').setOrigin(0, 0);
+            this.add.tween({
+                targets: [firstWave],
+                y: -640,
+                duration: 4000
+            });
             for (let i = 0; i < 15; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(2500, 3500) * i);
             }
         }
         else if (this._wave === 2) {
-            console.log('Wave 2');
+            let secondWave = this.add.sprite(0, 640, 'secondWave').setOrigin(0, 0);
+            this.add.tween({
+                targets: [secondWave],
+                y: -640,
+                duration: 4000
+            });
             for (let i = 0; i < 25; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(1500, 3000) * i);
             }
         }
         else if (this._wave === 3) {
-            console.log('Wave 3');
+            let thirdWave = this.add.sprite(0, 640, 'finalWave').setOrigin(0, 0);
+            this.add.tween({
+                targets: [thirdWave],
+                y: -640,
+                duration: 4000
+            });
             for (let i = 0; i < 40; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(500, 2000) * i);
             }
@@ -159,15 +252,17 @@ export class TestScene extends Phaser.Scene {
     }
 
     addRandomWaddler(delay: number) {
+        let lane = Phaser.Math.Between(0, 2);
         let yPositions = [160, 300, 450];
         let difficulty = [[15000, 30000], [5000, 15000], [3000, 10000]];
         new Waddler(
             this,
             656,
-            yPositions[Phaser.Math.Between(0, 2)],
+            yPositions[lane],
             'knight',
             Phaser.Math.Between(difficulty[this._wave - 1][0], difficulty[this._wave - 1][1]),
-            delay);
+            delay,
+            lane);
     }
 
     onSteakified() {
@@ -177,8 +272,17 @@ export class TestScene extends Phaser.Scene {
             if (unsteaked.length === 0) {
                 this._waveCleared = true;
                 this._wave++;
-                console.log('Gonna start a new wave!');
-                this.time.delayedCall(2000, this.startWave, null, this);
+                if (this._wave === 4) {
+                    let youWin = this.add.sprite(0, -480, 'youWin').setOrigin(0, 0);
+                    this.add.tween({
+                        targets: [youWin],
+                        y: 0,
+                        duration: 3000,
+                        ease: 'Bounce.easeOut'
+                    })
+                } else {
+                    this.time.delayedCall(2000, this.startWave, null, this);
+                }
             }
         }
     }

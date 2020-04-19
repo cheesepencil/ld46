@@ -1,16 +1,18 @@
-import { TestScene } from "./TestScene";
+import { MyGameScene } from "./myGameScene";
 
 export class Waddler extends Phaser.GameObjects.Sprite {
-    _scene: TestScene;
+    _scene: MyGameScene;
     _tweens: Phaser.Tweens.Tween[] = [];
     _collider: Phaser.Physics.Arcade.Collider;
     _particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
     _emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+    _lane: number;
 
     _isSteak: boolean = false;
 
-    constructor(scene: TestScene, x: number, y: number, texture: string, speed: number, delay: number) {
+    constructor(scene: MyGameScene, x: number, y: number, texture: string, speed: number, delay: number, lane:number) {
         super(scene, x, y, texture);
+        this._lane = lane;
         this._scene = scene;
         this.setOrigin(0.5, 1);
         scene.physics.add.existing(this);
@@ -135,7 +137,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
                 repeat: - 1,
                 yoyo: true
             }))
-            this.scene.events.emit('gameOver');
+            this.scene.events.emit('gameOver', this._lane);
         }
     }
 
