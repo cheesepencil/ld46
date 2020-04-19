@@ -1,4 +1,4 @@
-import 'phaser';
+import './phaser.min.js';
 import { MyGame } from './myGame';
 import { MyGameConfig } from './gameConfig';
 
