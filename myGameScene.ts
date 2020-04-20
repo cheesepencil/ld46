@@ -136,10 +136,7 @@ export class MyGameScene extends Phaser.Scene {
         // Game is starting now
         this.startWave();
 
-        if (!this._myInputManager) {
-            this._myInputManager = new MyInputManager(this, this._dragonHeadSprite);
-        }
-
+        this._myInputManager = new MyInputManager(this, this._dragonHeadSprite);
         this.events.addListener('gameOver', this.onGameOver, this);
         this.events.addListener('steakified', this.onSteakified, this);
         this.events.addListener('yummy', this.onYummy, this);
