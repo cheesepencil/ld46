@@ -12,71 +12,71 @@ var t;function e(t,e,i){return e in t?Object.defineProperty(t,e,{value:i,enumera
 },{}],"yZf3":[function(require,module,exports) {
 "use strict";var e=this&&this.__extends||function(){var e=function(t,a){return(e=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(e,t){e.__proto__=t}||function(e,t){for(var a in t)t.hasOwnProperty(a)&&(e[a]=t[a])})(t,a)};return function(t,a){function i(){this.constructor=t}e(t,a),t.prototype=null===a?Object.create(a):(i.prototype=a.prototype,new i)}}();Object.defineProperty(exports,"__esModule",{value:!0});var t=require("./myInputManager"),a=require("./waddler"),i=function(i){function s(){var e=i.call(this,{key:"MyGameScene"})||this;return e._drag=.95,e._moveMoventSpeed=50,e._maxVelocity=150,e._chargeSpeed=30,e._charge=0,e._lastSpew=0,e._minFireballVelocity=200,e._maxFireballVelocity=1e3,e._topDwaggieDead=!1,e._midDwaggieDead=!1,e._botDwaggieDead=!1,e._wave=1,e._gameOver=!1,e._waveCleared=!1,e}return e(s,i),s.prototype.preload=function(){},s.prototype.create=function(){var e=this;this._gameOver=!1,this._waveCleared=!1,this._wave=1,this._topDwaggieDead=!1,this._midDwaggieDead=!1,this._botDwaggieDead=!1,this._charge=0,this._lastSpew=0,this._throatSmokeManager=void 0,this._fireballSmokeManager=void 0,this.add.image(0,0,"background").setOrigin(0,0),this._dragonHeadSprite=this.add.sprite(128,100,"test").setOrigin(.125,.5).setDepth(3);var a=this.physics.add.existing(this._dragonHeadSprite);this._dragonHeadBody=a.body.setGravityY(-200).setCollideWorldBounds(!0,0,1).setMaxVelocity(0,this._maxVelocity).setDragY(this._drag),this._dragonHeadBody.useDamping=!0,this._throatSmokeManager?this._throatSmokeManager.emitters.shutdown():this._throatSmokeManager=this.add.particles("smoke");this._throatSmokeManager.createEmitter({x:{onEmit:function(){return e._dragonHeadBody.x}},y:{onEmit:function(){return e._dragonHeadBody.y+32}},angle:{onEmit:function(){return e._dragonHeadBody.rotation}},speed:500,frequency:.5,lifespan:{min:250,max:500},maxParticles:2e3,scale:{onEmit:function(){return.25},onUpdate:function(){return e._charge/100*1.5}},tint:{onUpdate:function(){var t=e._charge/100*255;return new Phaser.Display.Color(t,t,0).color}},blendMode:Phaser.BlendModes.DARKEN,rotate:{min:-180,max:180},alpha:{start:1,end:0}});var i=this.recalculateNeck();this._neck=this.add.rope(0,0,"neck",null,i),this._neck.setHorizontal(),this._neck.flipY=!0,this._neck.flipX=!0,this._neck.setDepth(2),this._fireballs=new Phaser.Physics.Arcade.Group(this.physics.world,this),this._waddlers=new Phaser.Physics.Arcade.Group(this.physics.world,this),this._topDwaggie=this.add.sprite(24,136,"dwaggie"),this._midDwaggie=this.add.sprite(24,276,"dwaggie"),this._botDwaggie=this.add.sprite(24,426,"dwaggie"),this.physics.world.on("worldbounds",this.onWorldBounds,this),this._powerupSound=this.sound.add("powerupSound"),this.startWave(),this._myInputManager||(this._myInputManager=new t.MyInputManager(this,this._dragonHeadSprite)),this.events.addListener("gameOver",this.onGameOver,this),this.events.addListener("steakified",this.onSteakified,this),this.events.addListener("yummy",this.onYummy,this)},s.prototype.update=function(e,t){var a=this._myInputManager.getInput();if(a.reset&&(this._fireballSmokeManager&&this._fireballSmokeManager.emitters.shutdown(),this._throatSmokeManager&&this._throatSmokeManager.emitters.shutdown(),this.sound.stopAll(),this.scene.restart()),!this._gameOver)if(a.headVerticalMovement&&this._dragonHeadBody.setVelocityY(this._dragonHeadBody.velocity.y+a.headVerticalMovement*this._moveMoventSpeed),this._dragonHeadSprite.angle=90*a.headRotation,a.charging&&e>this._lastSpew+1e3){this._charge;var i=this._charge+this._chargeSpeed/t;this._charge=i>100?100:i,100!==this._charge&&!1===this._powerupSound.isPlaying&&this._powerupSound.play()}else if(this._charge>0){this._lastSpew=e,this._dragonHeadSprite.tint=16777215,this._powerupSound.stop(),this.sound.play("spewSound");var s=this.add.sprite(this._dragonHeadSprite.x,this._dragonHeadSprite.y+8,"fireball").setOrigin(.5,.5);this._fireballs.add(s),this.add.tween({targets:[s],duration:300,repeat:-1,angle:360}),this._fireballSmokeManager||(this._fireballSmokeManager=this.add.particles("fireball")),this._fireballSmokeManager.createEmitter({alpha:{start:1,end:0},scale:{start:.95,end:4},speed:0,rotate:{min:-180,max:180},lifespan:{min:250,max:500},blendMode:"ADD",frequency:.001,maxParticles:2e3,x:{onEmit:function(){return s.x}},y:{onEmit:function(){return s.y}}});var r=this._maxFireballVelocity-this._minFireballVelocity,n=this._minFireballVelocity+Math.ceil(r*(this._charge/100)),o=s.body.setCollideWorldBounds();o.onWorldBounds=!0,this.physics.velocityFromAngle(this._dragonHeadSprite.angle,n,o.velocity),this._charge=0}var d=this.recalculateNeck();this._neck.setPoints(d)},s.prototype.onWorldBounds=function(e){var t=this,a=this._fireballs.getChildren().filter(function(t){return t.body===e});if(a){this.time.delayedCall(500,function(){t._fireballSmokeManager&&t._fireballSmokeManager.emitters.shutdown()},null,this);var i=a[0];this._fireballs.killAndHide(i),i.destroy()}},s.prototype.onGameOver=function(e){var t;0===e?(t=this._topDwaggie,this._topDwaggieDead||(this._topDwaggieDead=!0,this.add.tween({targets:[t],rotation:360,repeat:-1}))):1===e?(t=this._midDwaggie,this._midDwaggieDead||(this._midDwaggieDead=!0,this.add.tween({targets:[t],rotation:360,repeat:-1}))):2===e&&(t=this._botDwaggie,this._botDwaggieDead||(this._botDwaggieDead=!0,this.add.tween({targets:[t],rotation:360,repeat:-1})));var a=Phaser.Math.Between(-100,0),i=Phaser.Math.Between(-20,20),s=Phaser.Math.Between(-20,20);this.add.particles("gibs").createEmitter({x:t.x+i,y:t.y-s,angle:{min:a,max:a+2},speed:100,frequency:2,gravityY:100,lifespan:{min:1e3,max:2e3},maxParticles:100,scale:{start:1,end:5},blendMode:Phaser.BlendModes.NORMAL,rotate:{min:-180,max:180},alpha:{start:1,end:0}});if(!this._gameOver){this.sound.stopAll(),this.sound.play("gameOverSound"),this._dragonHeadBody.setGravityY(300),this.tweens.add({targets:[this._dragonHeadSprite],duration:1e3,angle:60});var r=this.add.sprite(0,480,"gameOver").setOrigin(0,0);this.add.tween({targets:[r],y:0,duration:3e3,ease:"Bounce.easeOut"}),this._gameOver=!0}},s.prototype.onYummy=function(e){if(!this._gameOver){var t=void 0;0===e?(t=this._topDwaggie).y=136:1===e?(t=this._midDwaggie).y=276:2===e&&((t=this._botDwaggie).y=426),this._yummySound?!1===this._yummySound.isPlaying&&(this._yummySound=this.sound.add("yummy"+Phaser.Math.Between(1,4)),this._yummySound.play()):(this._yummySound=this.sound.add("yummy"+Phaser.Math.Between(1,4)),this._yummySound.play()),this.add.tween({targets:[t],y:t.y-48,duration:300,repeat:3,yoyo:!0,ease:"Bounce.easeOut"})}},s.prototype.startWave=function(){if(this.sound.play("gameSong"),this._waveCleared=!1,1===this._wave){var e=this.add.sprite(0,640,"firstWave").setOrigin(0,0);this.add.tween({targets:[e],y:-640,duration:4e3});for(var t=0;t<15;t++)this.addRandomWaddler(Phaser.Math.Between(2500,3500)*t)}else if(2===this._wave){var a=this.add.sprite(0,640,"secondWave").setOrigin(0,0);this.add.tween({targets:[a],y:-640,duration:4e3});for(t=0;t<25;t++)this.addRandomWaddler(Phaser.Math.Between(1500,3e3)*t)}else if(3===this._wave){var i=this.add.sprite(0,640,"finalWave").setOrigin(0,0);this.add.tween({targets:[i],y:-640,duration:4e3});for(t=0;t<40;t++)this.addRandomWaddler(Phaser.Math.Between(500,2e3)*t)}},s.prototype.addRandomWaddler=function(e){var t=Phaser.Math.Between(0,2),i=[[15e3,3e4],[5e3,15e3],[3e3,1e4]];new a.Waddler(this,656,[160,300,450][t],"knight",Phaser.Math.Between(i[this._wave-1][0],i[this._wave-1][1]),e,t)},s.prototype.onSteakified=function(){if(!this._waveCleared&&0===this._waddlers.getChildren().filter(function(e){return!1===e._isSteak}).length)if(this._waveCleared=!0,this._wave++,4===this._wave){var e=this.add.sprite(0,-480,"youWin").setOrigin(0,0);this.add.tween({targets:[e],y:0,duration:3e3,ease:"Bounce.easeOut"})}else this.time.delayedCall(2e3,this.startWave,null,this)},s.prototype.recalculateNeck=function(){return new Phaser.Curves.Spline([new Phaser.Math.Vector2(this._dragonHeadBody.x+16,this._dragonHeadBody.y+32),new Phaser.Math.Vector2(this._dragonHeadBody.x-64,this._dragonHeadBody.y),new Phaser.Math.Vector2(-16,240)]).getDistancePoints(5)},s}(Phaser.Scene);exports.MyGameScene=i;
 },{"./myInputManager":"JUO3","./waddler":"rEZD"}],"ls7I":[function(require,module,exports) {
-module.exports="/steak.2a187b3d.png";
+module.exports="/ld46-publish/steak.2a187b3d.png";
 },{}],"X3BO":[function(require,module,exports) {
 "use strict";var t=this&&this.__extends||function(){var t=function(e,r){return(t=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)e.hasOwnProperty(r)&&(t[r]=e[r])})(e,r)};return function(e,r){function n(){this.constructor=e}t(e,r),e.prototype=null===r?Object.create(r):(n.prototype=r.prototype,new n)}}();Object.defineProperty(exports,"__esModule",{value:!0});var e=function(e){function r(){return e.call(this,{key:"MyPreloaderScene"})||this}return t(r,e),r.prototype.preload=function(){this.load.image("steak",require("./assets/steak.png")),this.add.text(320,240,"L O A D I N G").setOrigin(.5,.5)},r.prototype.create=function(){this.scene.start("MyLoaderScene")},r}(Phaser.Scene);exports.MyPreloaderScene=e;
 },{"./assets/steak.png":"ls7I"}],"nRhs":[function(require,module,exports) {
-module.exports="/test.0eefe61a.png";
+module.exports="/ld46-publish/test.0eefe61a.png";
 },{}],"NG8n":[function(require,module,exports) {
-module.exports="/background.db8ec9ca.png";
+module.exports="/ld46-publish/background.db8ec9ca.png";
 },{}],"PDJW":[function(require,module,exports) {
-module.exports="/knight.509ac989.png";
+module.exports="/ld46-publish/knight.509ac989.png";
 },{}],"eKRz":[function(require,module,exports) {
-module.exports="/smoke.44ab482e.png";
+module.exports="/ld46-publish/smoke.44ab482e.png";
 },{}],"QG00":[function(require,module,exports) {
-module.exports="/gibs.26ed217d.png";
+module.exports="/ld46-publish/gibs.26ed217d.png";
 },{}],"P3KX":[function(require,module,exports) {
-module.exports="/dwaggie.08dd7d25.png";
+module.exports="/ld46-publish/dwaggie.08dd7d25.png";
 },{}],"HOQk":[function(require,module,exports) {
-module.exports="/gameOver.b4c3697d.png";
+module.exports="/ld46-publish/gameOver.b4c3697d.png";
 },{}],"zgQF":[function(require,module,exports) {
-module.exports="/youWin.e27b573c.png";
+module.exports="/ld46-publish/youWin.e27b573c.png";
 },{}],"ESKI":[function(require,module,exports) {
-module.exports="/firstWave.74b615f6.png";
+module.exports="/ld46-publish/firstWave.74b615f6.png";
 },{}],"XD9j":[function(require,module,exports) {
-module.exports="/secondWave.92002d4e.png";
+module.exports="/ld46-publish/secondWave.92002d4e.png";
 },{}],"KeZJ":[function(require,module,exports) {
-module.exports="/finalWave.d50016b9.png";
+module.exports="/ld46-publish/finalWave.d50016b9.png";
 },{}],"WLwn":[function(require,module,exports) {
-module.exports="/neck.e557e67a.png";
+module.exports="/ld46-publish/neck.e557e67a.png";
 },{}],"TfOe":[function(require,module,exports) {
-module.exports="/lava.e845e137.png";
+module.exports="/ld46-publish/lava.e845e137.png";
 },{}],"Lqz8":[function(require,module,exports) {
-module.exports="/ld.57440d25.png";
+module.exports="/ld46-publish/ld.57440d25.png";
 },{}],"hQ10":[function(require,module,exports) {
-module.exports="/attribution.3ed34896.png";
+module.exports="/ld46-publish/attribution.3ed34896.png";
 },{}],"davG":[function(require,module,exports) {
-module.exports="/title.c3f34513.png";
+module.exports="/ld46-publish/title.c3f34513.png";
 },{}],"bRdg":[function(require,module,exports) {
-module.exports="/pressSpace.a65a049b.png";
+module.exports="/ld46-publish/pressSpace.a65a049b.png";
 },{}],"Hals":[function(require,module,exports) {
-module.exports="/controls.07dbb0ac.png";
+module.exports="/ld46-publish/controls.07dbb0ac.png";
 },{}],"LR0s":[function(require,module,exports) {
-module.exports="/fireball.fc412c43.png";
+module.exports="/ld46-publish/fireball.fc412c43.png";
 },{}],"nA2a":[function(require,module,exports) {
-module.exports="/ashify.3579d599.wav";
+module.exports="/ld46-publish/ashify.3579d599.wav";
 },{}],"b3xE":[function(require,module,exports) {
-module.exports="/gameover.f563a6cf.wav";
+module.exports="/ld46-publish/gameover.f563a6cf.wav";
 },{}],"wbw1":[function(require,module,exports) {
-module.exports="/gameplaysong.1ac6a035.wav";
+module.exports="/ld46-publish/gameplaysong.1ac6a035.wav";
 },{}],"UgCD":[function(require,module,exports) {
-module.exports="/introsong.6516e0b8.wav";
+module.exports="/ld46-publish/introsong.6516e0b8.wav";
 },{}],"exvX":[function(require,module,exports) {
-module.exports="/knight.126743c3.wav";
+module.exports="/ld46-publish/knight.126743c3.wav";
 },{}],"jACb":[function(require,module,exports) {
-module.exports="/powerup.cbff24a9.wav";
+module.exports="/ld46-publish/powerup.cbff24a9.wav";
 },{}],"IOkb":[function(require,module,exports) {
-module.exports="/spew.a21ae33d.wav";
+module.exports="/ld46-publish/spew.a21ae33d.wav";
 },{}],"FzUq":[function(require,module,exports) {
-module.exports="/steakify.07200bcd.wav";
+module.exports="/ld46-publish/steakify.07200bcd.wav";
 },{}],"W8my":[function(require,module,exports) {
-module.exports="/yummy1.5e0a8cf6.wav";
+module.exports="/ld46-publish/yummy1.5e0a8cf6.wav";
 },{}],"IIiN":[function(require,module,exports) {
-module.exports="/yummy2.6bad761e.wav";
+module.exports="/ld46-publish/yummy2.6bad761e.wav";
 },{}],"aAdR":[function(require,module,exports) {
-module.exports="/yummy3.4184b988.wav";
+module.exports="/ld46-publish/yummy3.4184b988.wav";
 },{}],"GJ3I":[function(require,module,exports) {
-module.exports="/yummy4.ff25161e.wav";
+module.exports="/ld46-publish/yummy4.ff25161e.wav";
 },{}],"wzGR":[function(require,module,exports) {
 "use strict";var e=this&&this.__extends||function(){var e=function(a,i){return(e=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(e,a){e.__proto__=a}||function(e,a){for(var i in a)a.hasOwnProperty(i)&&(e[i]=a[i])})(a,i)};return function(a,i){function t(){this.constructor=a}e(a,i),a.prototype=null===i?Object.create(i):(t.prototype=i.prototype,new t)}}();Object.defineProperty(exports,"__esModule",{value:!0});var a=function(a){function i(){return a.call(this,{key:"MyLoaderScene"})||this}return e(i,a),i.prototype.preload=function(){var e=this.add.sprite(320,240,"steak");e.setAngle(25),this.add.tween({targets:[e],y:e.y-16,yoyo:!0,repeat:-1,ease:"Back.easeInOut",duration:500}),this.add.tween({targets:[e],angle:-25,yoyo:!0,repeat:-1,duration:300}),this.load.image("test",require("./assets/test.png")),this.load.image("background",require("./assets/background.png")),this.load.image("knight",require("./assets/knight.png")),this.load.image("smoke",require("./assets/smoke.png")),this.load.image("gibs",require("./assets/gibs.png")),this.load.image("dwaggie",require("./assets/dwaggie.png")),this.load.image("gameOver",require("./assets/gameOver.png")),this.load.image("youWin",require("./assets/youWin.png")),this.load.image("firstWave",require("./assets/firstWave.png")),this.load.image("secondWave",require("./assets/secondWave.png")),this.load.image("finalWave",require("./assets/finalWave.png")),this.load.image("neck",require("./assets/neck.png")),this.load.image("lava",require("./assets/lava.png")),this.load.image("ld",require("./assets/ld.png")),this.load.image("attribution",require("./assets/attribution.png")),this.load.image("title",require("./assets/title.png")),this.load.image("pressSpace",require("./assets/pressSpace.png")),this.load.image("controls",require("./assets/controls.png")),this.load.image("fireball",require("./assets/fireball.png")),this.load.audio("ashify",require("./audio/ashify.wav")),this.load.audio("gameOverSound",require("./audio/gameover.wav")),this.load.audio("gameSong",require("./audio/gameplaysong.wav")),this.load.audio("introSong",require("./audio/introsong.wav")),this.load.audio("knightSound",require("./audio/knight.wav")),this.load.audio("powerupSound",require("./audio/powerup.wav")),this.load.audio("spewSound",require("./audio/spew.wav")),this.load.audio("steakifySound",require("./audio/steakify.wav")),this.load.audio("yummy1",require("./audio/yummy1.wav")),this.load.audio("yummy2",require("./audio/yummy2.wav")),this.load.audio("yummy3",require("./audio/yummy3.wav")),this.load.audio("yummy4",require("./audio/yummy4.wav"))},i.prototype.create=function(){this.time.delayedCall(1e3,this.onGoToTitle,null,this)},i.prototype.onGoToTitle=function(){this.scene.start("MyTitleScene")},i}(Phaser.Scene);exports.MyLoaderScene=a;
 },{"./assets/test.png":"nRhs","./assets/background.png":"NG8n","./assets/knight.png":"PDJW","./assets/smoke.png":"eKRz","./assets/gibs.png":"QG00","./assets/dwaggie.png":"P3KX","./assets/gameOver.png":"HOQk","./assets/youWin.png":"zgQF","./assets/firstWave.png":"ESKI","./assets/secondWave.png":"XD9j","./assets/finalWave.png":"KeZJ","./assets/neck.png":"WLwn","./assets/lava.png":"TfOe","./assets/ld.png":"Lqz8","./assets/attribution.png":"hQ10","./assets/title.png":"davG","./assets/pressSpace.png":"bRdg","./assets/controls.png":"Hals","./assets/fireball.png":"LR0s","./audio/ashify.wav":"nA2a","./audio/gameover.wav":"b3xE","./audio/gameplaysong.wav":"wbw1","./audio/introsong.wav":"UgCD","./audio/knight.wav":"exvX","./audio/powerup.wav":"jACb","./audio/spew.wav":"IOkb","./audio/steakify.wav":"FzUq","./audio/yummy1.wav":"W8my","./audio/yummy2.wav":"IIiN","./audio/yummy3.wav":"aAdR","./audio/yummy4.wav":"GJ3I"}],"r1ee":[function(require,module,exports) {
@@ -86,4 +86,4 @@ module.exports="/yummy4.ff25161e.wav";
 },{"./myGameScene":"yZf3","./myPreloaderScene":"X3BO","./myLoaderScene":"wzGR","./myTitleScene":"r1ee"}],"QCba":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),require("./phaser.min.js");var e=require("./myGame"),r=require("./gameConfig");window.onload=function(){new e.MyGame(r.MyGameConfig)};
 },{"./phaser.min.js":"KVrw","./myGame":"lUGh","./gameConfig":"l3nz"}]},{},["QCba"], null)
-//# sourceMappingURL=/ld46.aff59984.js.map
+//# sourceMappingURL=/ld46-publish/ld46.aff59984.js.map
