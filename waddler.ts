@@ -10,7 +10,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
 
     _isSteak: boolean = false;
 
-    constructor(scene: MyGameScene, x: number, y: number, texture: string, speed: number, delay: number, lane:number) {
+    constructor(scene: MyGameScene, x: number, y: number, texture: string, speed: number, delay: number, lane: number) {
         super(scene, x, y, texture);
         this._lane = lane;
         this._scene = scene;
@@ -31,7 +31,8 @@ export class Waddler extends Phaser.GameObjects.Sprite {
             ease: 'linear',
             x: 32,
             onComplete: this.onKillBaby,
-            callbackScope: this
+            callbackScope: this,
+            onStart: () => { this.scene.sound.play('knightSound') }
         }));
         this._tweens.push(scene.tweens.add({
             targets: [this],
@@ -79,6 +80,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
         });
         this._scene.time.delayedCall(500, this.onAddSteakCollider, null, this);
 
+        this.scene.sound.play('steakifySound');
         this._scene.events.emit('steakified');
 
         this._collider.destroy();
@@ -93,6 +95,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
     }
 
     onAshify() {
+        this.scene.sound.play('ashify');
         this._collider.destroy();
         this._particles = this.scene.add.particles('gibs');
         this._emitter = this._particles.createEmitter({
@@ -126,6 +129,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
             this.destroy();
         }
         else {
+            this.scene.events.emit('steakify');
             this._tweens.forEach(t => {
                 t.stop();
             })

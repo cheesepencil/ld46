@@ -24,6 +24,7 @@ export class MyLoaderScene extends Phaser.Scene {
             duration: 300
         })
 
+        // images
         this.load.image('test', require('./assets/test.png'));
         this.load.image('background', require('./assets/background.png'));
         this.load.image('knight', require('./assets/knight.png'));
@@ -43,6 +44,21 @@ export class MyLoaderScene extends Phaser.Scene {
         this.load.image('pressSpace', require('./assets/pressSpace.png'));
         this.load.image('controls', require('./assets/controls.png'));
         this.load.image('fireball', require('./assets/fireball.png'));
+
+        // sounds
+        this.load.audio('ashify', require('./audio/ashify.wav'));
+        this.load.audio('gameOverSound', require('./audio/gameover.wav'));
+        this.load.audio('gameSong', require('./audio/gameplaysong.wav'));
+        this.load.audio('introSong', require('./audio/introsong.wav'));
+        this.load.audio('knightSound', require('./audio/knight.wav'));
+        this.load.audio('powerupSound', require('./audio/powerup.wav'));
+        this.load.audio('spewSound', require('./audio/spew.wav'));
+        this.load.audio('steakifySound', require('./audio/steakify.wav'));
+        this.load.audio('yummy1', require('./audio/yummy1.wav'));
+        this.load.audio('yummy2', require('./audio/yummy2.wav'));
+        this.load.audio('yummy3', require('./audio/yummy3.wav'));
+        this.load.audio('yummy4', require('./audio/yummy4.wav'));
+
     }
 
     create() {

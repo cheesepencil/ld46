@@ -23,3 +23,12 @@ Right bumper or right trigger: power up mommy dragon's fire breath
 Release right bumper or right trigger: spew a fireball!
 Right stick: aim mommy dragon's fireballs
 
+### Audio Assets to Make    and implement
+- fireball charging check   done
+- fireball spew     check   done
+- steakified        check   done
+- ashified          check   done
+- yummy             check   done
+- knight appears    check   done
+- baby dies         check   done
+- tunes             check   done

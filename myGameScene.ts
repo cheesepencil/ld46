@@ -44,6 +44,10 @@ export class MyGameScene extends Phaser.Scene {
     _gameOver: boolean = false;
     _waveCleared: boolean = false;
 
+    // sound
+    _yummySound: Phaser.Sound.BaseSound;
+    _powerupSound: Phaser.Sound.BaseSound;
+
     constructor() {
         super({ key: 'MyGameScene' });
     }
@@ -61,6 +65,9 @@ export class MyGameScene extends Phaser.Scene {
         this._botDwaggieDead = false;
         this._charge = 0;
         this._lastSpew = 0;
+
+        this._throatSmokeManager = undefined;
+        this._fireballSmokeManager = undefined;
 
         this.add.image(0, 0, 'background').setOrigin(0, 0);
 
@@ -123,6 +130,9 @@ export class MyGameScene extends Phaser.Scene {
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
 
+        // audio
+        this._powerupSound = this.sound.add('powerupSound');
+
         // Game is starting now
         this.startWave();
 
@@ -139,6 +149,13 @@ export class MyGameScene extends Phaser.Scene {
         // input
         let myInput = this._myInputManager.getInput();
         if (myInput.reset) {
+            if (this._fireballSmokeManager) {
+                this._fireballSmokeManager.emitters.shutdown();
+            }
+            if (this._throatSmokeManager) {
+                this._throatSmokeManager.emitters.shutdown();
+            }
+            this.sound.stopAll();
             this.scene.restart();
         }
         if (!this._gameOver) {
@@ -152,9 +169,15 @@ export class MyGameScene extends Phaser.Scene {
                 let oldCharge = this._charge;
                 let newCharge = this._charge + (this._chargeSpeed / delta);
                 this._charge = newCharge > 100 ? 100 : newCharge;
+                if (this._charge !== 100 && this._powerupSound.isPlaying === false) {
+                    this._powerupSound.play();
+                }
             } else if (this._charge > 0) {
                 this._lastSpew = time;
                 this._dragonHeadSprite.tint = 0xffffff;
+
+                this._powerupSound.stop();
+                this.sound.play('spewSound');
 
                 let fireballSprite = this.add
                     .sprite(this._dragonHeadSprite.x, this._dragonHeadSprite.y + 8, 'fireball')
@@ -208,7 +231,9 @@ export class MyGameScene extends Phaser.Scene {
         let fireballFilter = fireballs.filter(f => f.body === body);
         if (fireballFilter) {
             this.time.delayedCall(500, () => {
-                this._fireballSmokeManager.emitters.shutdown();
+                if (this._fireballSmokeManager) {
+                    this._fireballSmokeManager.emitters.shutdown();
+                }
             }, null, this);
 
             let fireball = fireballFilter[0];
@@ -271,6 +296,8 @@ export class MyGameScene extends Phaser.Scene {
         });
 
         if (!this._gameOver) {
+            this.sound.stopAll();
+            this.sound.play('gameOverSound');
             this._dragonHeadBody.setGravityY(300);
             this.tweens.add({
                 targets: [this._dragonHeadSprite],
@@ -302,6 +329,16 @@ export class MyGameScene extends Phaser.Scene {
                 dwaggie.y = 450 - 24;
             }
 
+            if (this._yummySound) {
+                if (this._yummySound.isPlaying === false) {
+                    this._yummySound = this.sound.add(`yummy${Phaser.Math.Between(1, 4)}`);
+                    this._yummySound.play();
+                }
+            } else {
+                this._yummySound = this.sound.add(`yummy${Phaser.Math.Between(1, 4)}`);
+                this._yummySound.play();
+            }
+
             this.add.tween({
                 targets: [dwaggie],
                 y: dwaggie.y - 48,
@@ -314,6 +351,7 @@ export class MyGameScene extends Phaser.Scene {
     }
 
     startWave() {
+        this.sound.play('gameSong');
         this._waveCleared = false;
         if (this._wave === 1) {
             let firstWave = this.add.sprite(0, 640, 'firstWave').setOrigin(0, 0);
@@ -322,6 +360,7 @@ export class MyGameScene extends Phaser.Scene {
                 y: -640,
                 duration: 4000
             });
+            // 15
             for (let i = 0; i < 15; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(2500, 3500) * i);
             }
@@ -333,6 +372,7 @@ export class MyGameScene extends Phaser.Scene {
                 y: -640,
                 duration: 4000
             });
+            // 25
             for (let i = 0; i < 25; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(1500, 3000) * i);
             }
@@ -344,6 +384,7 @@ export class MyGameScene extends Phaser.Scene {
                 y: -640,
                 duration: 4000
             });
+            // 40
             for (let i = 0; i < 40; i++) {
                 this.addRandomWaddler(Phaser.Math.Between(500, 2000) * i);
             }

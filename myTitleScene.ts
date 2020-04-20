@@ -58,6 +58,7 @@ export class MyTitleScene extends Phaser.Scene {
         })
 
         this.time.delayedCall(2000, this.onAllowInput, null, this);
+        this.sound.play('introSong');
     }
 
     onAllowInput() {
@@ -92,6 +93,7 @@ export class MyTitleScene extends Phaser.Scene {
             if (doIt) {
                 this._suppress_input = true;
                 if (this._showing_controls) {
+                    this.sound.stopAll();
                     this.scene.start('MyGameScene');
                 } else {
                     this._showing_controls = true;
