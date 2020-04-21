@@ -6,14 +6,15 @@ export class MyLoaderScene extends Phaser.Scene {
     }
 
     preload() {
+        this.add.text(320, 280, 'L O A D I N G').setOrigin(0.5, 0.5);
         let steakBouncer = this.add.sprite(320, 240, 'steak');
         steakBouncer.setAngle(25)
         this.add.tween({
             targets: [steakBouncer],
-            y: steakBouncer.y - 16,
+            y: steakBouncer.y - 24,
             yoyo: true,
             repeat: -1,
-            ease: 'Back.easeInOut',
+            ease: 'Back.easeOut',
             duration: 500
         })
         this.add.tween({
@@ -23,6 +24,10 @@ export class MyLoaderScene extends Phaser.Scene {
             repeat: -1,
             duration: 300
         })
+
+        // music
+        this.load.audio('gameSong', require('./audio/gameplaysong.wav'));
+        this.load.audio('introSong', require('./audio/introsong.wav'));
 
         // images
         this.load.image('test', require('./assets/test.png'));
@@ -48,8 +53,6 @@ export class MyLoaderScene extends Phaser.Scene {
         // sounds
         this.load.audio('ashify', require('./audio/ashify.wav'));
         this.load.audio('gameOverSound', require('./audio/gameover.wav'));
-        this.load.audio('gameSong', require('./audio/gameplaysong.wav'));
-        this.load.audio('introSong', require('./audio/introsong.wav'));
         this.load.audio('knightSound', require('./audio/knight.wav'));
         this.load.audio('powerupSound', require('./audio/powerup.wav'));
         this.load.audio('spewSound', require('./audio/spew.wav'));

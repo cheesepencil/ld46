@@ -17,6 +17,7 @@ export class MyTitleScene extends Phaser.Scene {
     }
 
     create() {
+        this.sound.play('introSong');
         this._space_key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         const curve = new Phaser.Curves.Spline([
@@ -45,20 +46,19 @@ export class MyTitleScene extends Phaser.Scene {
             targets: [this._attribution, this._ld],
             duration: 2000,
             y: 0,
-            delay: 1500,
+            delay: 1000,
             repeat: 0
         });
         this.tweens.add({
             targets: [this._pressStart],
             duration: 1000,
             alpha: 1,
-            delay: 4000,
+            delay: 3000,
             repeat: -1,
             yoyo: true
         })
 
         this.time.delayedCall(2000, this.onAllowInput, null, this);
-        this.sound.play('introSong');
     }
 
     onAllowInput() {

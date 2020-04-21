@@ -301,7 +301,7 @@ export class MyGameScene extends Phaser.Scene {
                 duration: 1000,
                 angle: 60
             });
-            let gameOver = this.add.sprite(0, 480, 'gameOver').setOrigin(0, 0);
+            let gameOver = this.add.sprite(0, 480, 'gameOver').setOrigin(0, 0).setDepth(10);
             this.add.tween({
                 targets: [gameOver],
                 y: 0,
@@ -351,7 +351,7 @@ export class MyGameScene extends Phaser.Scene {
         this.sound.play('gameSong');
         this._waveCleared = false;
         if (this._wave === 1) {
-            let firstWave = this.add.sprite(0, 640, 'firstWave').setOrigin(0, 0);
+            let firstWave = this.add.sprite(0, 640, 'firstWave').setOrigin(0, 0).setDepth(10);
             this.add.tween({
                 targets: [firstWave],
                 y: -640,
@@ -363,7 +363,7 @@ export class MyGameScene extends Phaser.Scene {
             }
         }
         else if (this._wave === 2) {
-            let secondWave = this.add.sprite(0, 640, 'secondWave').setOrigin(0, 0);
+            let secondWave = this.add.sprite(0, 640, 'secondWave').setOrigin(0, 0).setDepth(10);
             this.add.tween({
                 targets: [secondWave],
                 y: -640,
@@ -375,7 +375,7 @@ export class MyGameScene extends Phaser.Scene {
             }
         }
         else if (this._wave === 3) {
-            let thirdWave = this.add.sprite(0, 640, 'finalWave').setOrigin(0, 0);
+            let thirdWave = this.add.sprite(0, 640, 'finalWave').setOrigin(0, 0).setDepth(10);
             this.add.tween({
                 targets: [thirdWave],
                 y: -640,
@@ -410,7 +410,7 @@ export class MyGameScene extends Phaser.Scene {
                 this._waveCleared = true;
                 this._wave++;
                 if (this._wave === 4) {
-                    let youWin = this.add.sprite(0, -480, 'youWin').setOrigin(0, 0);
+                    let youWin = this.add.sprite(0, -480, 'youWin').setOrigin(0, 0).setDepth(10);
                     this.add.tween({
                         targets: [youWin],
                         y: 0,
