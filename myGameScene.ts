@@ -47,6 +47,7 @@ export class MyGameScene extends Phaser.Scene {
     // sound
     _yummySound: Phaser.Sound.BaseSound;
     _powerupSound: Phaser.Sound.BaseSound;
+    _soundVolume: number = 0.2;
 
     constructor() {
         super({ key: 'MyGameScene' });
@@ -131,7 +132,7 @@ export class MyGameScene extends Phaser.Scene {
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
 
         // audio
-        this._powerupSound = this.sound.add('powerupSound');
+        this._powerupSound = this.sound.add('powerupSound', { volume: this._soundVolume });
 
         // Game is starting now
         this.startWave();
@@ -167,14 +168,14 @@ export class MyGameScene extends Phaser.Scene {
                 let newCharge = this._charge + (this._chargeSpeed / delta);
                 this._charge = newCharge > 100 ? 100 : newCharge;
                 if (this._charge !== 100 && this._powerupSound.isPlaying === false) {
-                    this._powerupSound.play();
+                    this._powerupSound.play({ volume: this._soundVolume });
                 }
             } else if (this._charge > 0) {
                 this._lastSpew = time;
                 this._dragonHeadSprite.tint = 0xffffff;
 
                 this._powerupSound.stop();
-                this.sound.play('spewSound');
+                this.sound.play('spewSound', { volume: this._soundVolume });
 
                 let fireballSprite = this.add
                     .sprite(this._dragonHeadSprite.x, this._dragonHeadSprite.y + 8, 'fireball')

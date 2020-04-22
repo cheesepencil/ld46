@@ -9,6 +9,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
     _lane: number;
 
     _isSteak: boolean = false;
+    _soundVolume: number = 0.25;
 
     constructor(scene: MyGameScene, x: number, y: number, texture: string, speed: number, delay: number, lane: number) {
         super(scene, x, y, texture);
@@ -32,7 +33,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
             x: 32,
             onComplete: this.onKillBaby,
             callbackScope: this,
-            onStart: () => { this.scene.sound.play('knightSound') }
+            onStart: () => { this.scene.sound.play('knightSound', { volume: this._soundVolume }) }
         }));
         this._tweens.push(scene.tweens.add({
             targets: [this],
@@ -80,7 +81,7 @@ export class Waddler extends Phaser.GameObjects.Sprite {
         });
         this._scene.time.delayedCall(500, this.onAddSteakCollider, null, this);
 
-        this.scene.sound.play('steakifySound');
+        this.scene.sound.play('steakifySound', { volume: this._soundVolume });
         this._scene.events.emit('steakified');
 
         this._collider.destroy();
